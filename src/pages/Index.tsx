@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { VideoUploader } from "@/components/VideoUploader";
 import { VideoPreview } from "@/components/VideoPreview";
+import { VideoLayoutControls, type VideoLayout } from "@/components/VideoLayoutControls";
 import { useState } from "react";
 import { processVideo } from "@/utils/videoProcessor";
 import { useToast } from "@/hooks/use-toast";
@@ -11,6 +12,9 @@ const Index = () => {
   const [parkourVideo, setParkourVideo] = useState<File | null>(null);
   const [processedVideo, setProcessedVideo] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [layout, setLayout] = useState<VideoLayout>('side-by-side');
+  const [ratio, setRatio] = useState(0.3); // 30% for PiP
+  const [pipPosition, setPipPosition] = useState({ x: 0.8, y: 0.8 }); // bottom-right corner
   const { toast } = useToast();
 
   const handleProcessVideo = async () => {
@@ -25,7 +29,11 @@ const Index = () => {
 
     try {
       setIsProcessing(true);
-      const processedBlob = await processVideo(uploadedVideo, parkourVideo);
+      const processedBlob = await processVideo(uploadedVideo, parkourVideo, {
+        layout,
+        ratio,
+        pipPosition
+      });
       const processedFile = new File([processedBlob], 'processed.mp4', { type: 'video/mp4' });
       setProcessedVideo(processedFile);
       toast({
@@ -33,6 +41,7 @@ const Index = () => {
         description: "Your video has been processed successfully."
       });
     } catch (error) {
+      console.error('Processing error:', error);
       toast({
         variant: "destructive",
         title: "Processing failed",
@@ -64,6 +73,22 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <VideoUploader onVideoUpload={setParkourVideo} />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Layout Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <VideoLayoutControls
+                layout={layout}
+                setLayout={setLayout}
+                ratio={ratio}
+                setRatio={setRatio}
+                pipPosition={pipPosition}
+                setPipPosition={setPipPosition}
+              />
             </CardContent>
           </Card>
 
