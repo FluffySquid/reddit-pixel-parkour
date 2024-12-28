@@ -9,6 +9,12 @@
     <meta property="og:image" content="/og-image.png" />
     <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
     <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp" />
+    <script>
+      // Polyfill for SharedArrayBuffer
+      if (typeof SharedArrayBuffer === 'undefined') {
+        window.SharedArrayBuffer = ArrayBuffer;
+      }
+    </script>
   </head>
 
   <body>
